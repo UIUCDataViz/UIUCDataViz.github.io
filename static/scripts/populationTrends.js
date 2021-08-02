@@ -129,7 +129,7 @@ function plotCountry(countryName, color) {
     populationTrend.selectedCountryNamesList.push(countryName);
 }
 
-function getCountryDetails(cName) { return Object.entries(allCountriesData).map(e => {var o = {};  o["year"] = e[0]; o[cName] = e[1][cName]; return o; }); }
+function getCountryDetails(cName) { return Object.entries(allCountriesData).map(e => {var o = {};  o["year"] = parseInt(e[0]); o[cName] = e[1][cName]; return o; }); }
 
 function getContinentDetails(cName) {
     var fileName = ""
