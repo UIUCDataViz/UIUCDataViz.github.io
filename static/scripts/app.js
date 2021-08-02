@@ -19,7 +19,7 @@ function showPage(pageName, successCallback) {
 }
 
 function clearAllCharts() {
-    var trends = [fertilityTrend, populationTrend, mortalityTrend];
+    var trends = [populationTrend];
 
     for (var i = 0; i< trends.length; i++) {
         trend = trends[i];
