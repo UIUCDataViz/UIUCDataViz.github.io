@@ -28,7 +28,8 @@ function initializeLineChartTheme(obj) {
         obj.lineValueAxis = obj.lineChart.yAxes.push(new am4charts.ValueAxis());
         obj.lineValueAxis.title.text = obj.lineChartYAxis.title;
 
-        obj.lineDateAxis.start = 0.5;
+        obj.lineDateAxis.start = 0;
+        obj.lineDateAxis.end = 0.5;
         obj.lineDateAxis.keepSelection = true;
 
         obj.lineChart.cursor = new am4charts.XYCursor();

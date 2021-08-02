@@ -244,6 +244,7 @@ function initializeChoroplethSlider(obj, mapSliderDivName) {
             .attr("transform", "translate(" + margin.left + "," + (height/2 - 10) + ")");
 
         var choroplethSlider = d3.sliderHorizontal()
+			.fill("#206595")
             .min(1950)
             .max(2050)
             .step(1)
