@@ -1,7 +1,7 @@
 const countryNameDict = {};
 let jsonData = {};
 
-Promise.all([
+globalThis.preReqPromise = Promise.all([
     d3.tsv('https://unpkg.com/world-atlas@1.1.4/world/110m.tsv'),
     d3.json('https://unpkg.com/world-atlas@1.1.4/world/50m.json')])
     .then(([tsvData, jsonData1]) => {
@@ -68,63 +68,65 @@ function drawMap(obj, onClickCountry, onUnClickCountry) {
         .attr('class', 'sphere ' + mapDivName)
         .attr('d', pathGenerator({type: 'Sphere'}));
 
-    var countries = topojson.feature(jsonData, jsonData.objects.countries);
-    gMap.selectAll('path')
-        .data(countries.features)
-        .enter().append('path')
-        .attr('class', 'country ' + mapDivName)
-        .attr('d', pathGenerator)
-        .attr('stroke', 'white')
-        .attr('stroke-width', '1px')
-        .style('fill',function(d){
-            var selectedCountryName = countryNameDict[d.id];
-            var fillKey = getDatabaseCountryName(selectedCountryName);
+    preReqPromise.then(() => {
+        var countries = topojson.feature(jsonData, jsonData.objects.countries);
+        gMap.selectAll('path')
+            .data(countries.features)
+            .enter().append('path')
+            .attr('class', 'country ' + mapDivName)
+            .attr('d', pathGenerator)
+            .attr('stroke', 'white')
+            .attr('stroke-width', '1px')
+            .style('fill',function(d){
+                var selectedCountryName = countryNameDict[d.id];
+                var fillKey = getDatabaseCountryName(selectedCountryName);
 
-            return obj.colorScale(fillKey);
-        })
-        .on('mousedown.log', function (d) {
-            var selectedCountryName = countryNameDict[d.id];
-            var choroplethCountryName = getDatabaseCountryName(selectedCountryName);
+                return obj.colorScale(fillKey);
+            })
+            .on('mousedown.log', function (d) {
+                var selectedCountryName = countryNameDict[d.id];
+                var choroplethCountryName = getDatabaseCountryName(selectedCountryName);
 
-            if(!obj.selectedCountryNamesList.includes(selectedCountryName)
-                && (obj.selectedCountryNamesList.length) < 10) {
+                if(!obj.selectedCountryNamesList.includes(selectedCountryName)
+                    && (obj.selectedCountryNamesList.length) < 10) {
 
-                var col = obj.countryColorIndex;
-                var newColor = obj.tenCountryColors[col];
-                obj.countryColorIndex = col + 1;
+                    var col = obj.countryColorIndex;
+                    var newColor = obj.tenCountryColors[col];
+                    obj.countryColorIndex = col + 1;
 
-                d3.select(this).style('fill', newColor);
-                onClickCountry(selectedCountryName, newColor);
+                    d3.select(this).style('fill', newColor);
+                    onClickCountry(selectedCountryName, newColor);
 
-            } else if(obj.selectedCountryNamesList.includes(selectedCountryName)) {
-                obj.deletePlace = selectedCountryName;
-                onUnClickCountry(obj);
+                } else if(obj.selectedCountryNamesList.includes(selectedCountryName)) {
+                    obj.deletePlace = selectedCountryName;
+                    onUnClickCountry(obj);
 
-                var newColor = obj.colorScale(choroplethCountryName);
-                d3.select(this).style('fill',newColor);
+                    var newColor = obj.colorScale(choroplethCountryName);
+                    d3.select(this).style('fill',newColor);
 
-            } else if(obj.selectedCountryNamesList.length === 10) {
-                alert("Max selection 10 exceeded.");
-            }
-        })
-        .append('title')
-        .attr('class','countryName ' + mapDivName)
-        .text(function(d){
-            var selectedCountryName = countryNameDict[d.id];
-            var fillKey = getDatabaseCountryName(selectedCountryName);
-            var text = obj.currentChoroplethData[fillKey];
-            if(text === undefined) {
-                text = "No data";
-            }
-            return(countryNameDict[d.id]+" : " + text)
-        });
+                } else if(obj.selectedCountryNamesList.length === 10) {
+                    alert("Max selection 10 exceeded.");
+                }
+            })
+            .append('title')
+            .attr('class','countryName ' + mapDivName)
+            .text(function(d){
+                var selectedCountryName = countryNameDict[d.id];
+                var fillKey = getDatabaseCountryName(selectedCountryName);
+                var text = obj.currentChoroplethData[fillKey];
+                if(text === undefined) {
+                    text = "No data";
+                }
+                return(countryNameDict[d.id]+" : " + text)
+            });
 
-    initializeChoroplethSlider(obj, mapSliderDivName);
-    initializeChoroplethLegend(obj, mapDivName);
-    var screenText = document.getElementById("choroplethYear");
-    if(screenText !== undefined && screenText !== null) {
-        screenText.innerHTML = parseInt(obj.choroplethSliderYear);
-    }
+        initializeChoroplethSlider(obj, mapSliderDivName);
+        initializeChoroplethLegend(obj, mapDivName);
+        var screenText = document.getElementById("choroplethYear");
+        if(screenText !== undefined && screenText !== null) {
+            screenText.innerHTML = parseInt(obj.choroplethSliderYear);
+        }
+    });
 }
 
 function updateChoropleth(obj) {
